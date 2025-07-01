@@ -1,0 +1,65 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "FlexRepeater"
+        },
+        "position": {
+          "basis": "320px"
+        },
+        "propConfig": {
+          "props.instances": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "start": "{[default]PLC_auto_cycle/Start}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\n    if value is None or not value[\"start\"]:\n        return []\n    \n    startTagPath \u003d \"[default]PLC_auto_cycle/Start\"\n    startQV \u003d system.tag.readBlocking([startTagPath])[0]\n    startTime \u003d startQV.timestamp\n    \n    \n    instances \u003d []\n    cumulative_time \u003d 0\n    \n    try:\n        condition_paths \u003d []\n        for i in range(1, 9):\n            condition_paths.append(\"[default]PLC_auto_cycle/Condition_times/Condition_times_{}_\".format(i))\n        \n        condition_qvs \u003d system.tag.readBlocking(condition_paths)\n        \n        sample_paths \u003d []\n        for i in range(1, 17):\n            sample_paths.append(\"[default]PLC_auto_cycle/Sample_Interval/Sample_Interval_{}_\".format(i))\n        \n        sample_qvs \u003d system.tag.readBlocking(sample_paths)\n        \n        sample_index \u003d 0\n        \n        for condition_num, condition_qv in enumerate(condition_qvs):\n            if condition_qv.value is None:\n                continue\n                \n            duration \u003d int(condition_qv.value)\n            \n            if cumulative_time \u003d\u003d 0:\n                condition_start \u003d startTime\n            else:\n                condition_start \u003d system.date.addMinutes(startTime, cumulative_time)\n            \n            sample1_time \u003d None\n            sample2_time \u003d None\n            \n            if sample_index \u003c len(sample_qvs) and sample_qvs[sample_index].value is not None:\n                sample1_time \u003d system.date.addMinutes(condition_start, int(sample_qvs[sample_index].value))\n            \n            if sample_index + 1 \u003c len(sample_qvs) and sample_qvs[sample_index + 1].value is not None:\n                sample2_time \u003d system.date.addMinutes(condition_start, int(sample_qvs[sample_index + 1].value))\n            \n            instance \u003d {\n                \"conditionNumber\": condition_num + 1,\n                \"conditionStartTime\": condition_start,\n                \"conditionDuration\": duration,\n                \"sample1StartTime\": sample1_time,\n                \"sample2StartTime\": sample2_time,\n                \n            }\n            \n            instances.append(instance)\n            cumulative_time +\u003d duration\n            sample_index +\u003d 2\n            \n    except Exception as e:\n        return [{\"error\": str(e), \"line\": str(e.__traceback__.tb_lineno)}]\n    \n    return instances",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "direction": "column",
+          "path": "condition_view",
+          "wrap": "wrap"
+        },
+        "type": "ia.display.flex-repeater"
+      }
+    ],
+    "custom": {
+      "autoStartTime": []
+    },
+    "meta": {
+      "name": "root"
+    },
+    "propConfig": {
+      "custom.currentTime": {
+        "binding": {
+          "config": {
+            "expression": "now(1000)"
+          },
+          "type": "expr"
+        }
+      }
+    },
+    "props": {
+      "alignContent": "flex-start",
+      "alignItems": "flex-start",
+      "direction": "column",
+      "wrap": "wrap"
+    },
+    "type": "ia.container.flex"
+  }
+}

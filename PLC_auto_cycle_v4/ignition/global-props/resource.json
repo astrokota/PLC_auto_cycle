@@ -1,0 +1,16 @@
+{
+  "scope": "A",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "data.bin"
+  ],
+  "attributes": {
+    "lastModificationSignature": "f3345a442b31121cd77c96b31a5acd565e5b101967ba3776aaf795bf26547037",
+    "lastModification": {
+      "actor": "dakotamitchell",
+      "timestamp": "2025-06-05T17:54:47Z"
+    }
+  }
+}

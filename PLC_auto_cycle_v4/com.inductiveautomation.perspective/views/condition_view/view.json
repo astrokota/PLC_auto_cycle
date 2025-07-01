@@ -1,0 +1,229 @@
+{
+  "custom": {},
+  "params": {
+    "conditionDuration": "value",
+    "conditionNumber": "value",
+    "conditionStartTime": "value",
+    "currentTime": "value",
+    "sample1StartTime": "value",
+    "sample2StartTime": "value"
+  },
+  "propConfig": {
+    "params.conditionDuration": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.conditionNumber": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.conditionStartTime": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.currentTime": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.sample1StartTime": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.sample2StartTime": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 200,
+      "width": 400
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "32px"
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "\"Condition \" + {view.params.conditionNumber}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_0"
+        },
+        "position": {
+          "basis": "32px"
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{parent.custom.conditionStatus}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_1"
+        },
+        "position": {
+          "basis": "32px"
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "\"Start:\" + dateFormat({view.params.conditionStartTime}, \"hh:mm:ss a\")"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_2"
+        },
+        "position": {
+          "basis": "32px"
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "\"Sample \" + ({view.params.conditionNumber} * 2 - 1) + \": \" + dateFormat({view.params.sample1StartTime}, \"hh:mm:ss a\")"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Icon"
+        },
+        "position": {
+          "basis": "30px"
+        },
+        "propConfig": {
+          "meta.visible": {
+            "binding": {
+              "config": {
+                "path": "parent.custom.sample1Warning"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "color": "#FF8C00",
+          "path": "material/warning"
+        },
+        "type": "ia.display.icon"
+      },
+      {
+        "meta": {
+          "name": "Label_3"
+        },
+        "position": {
+          "basis": "32px"
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "\"Sample \" + ({view.params.conditionNumber} * 2) + \": \" + dateFormat({view.params.sample2StartTime}, \"hh:mm:ss a\")"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Icon_0"
+        },
+        "position": {
+          "basis": "30px"
+        },
+        "propConfig": {
+          "meta.visible": {
+            "binding": {
+              "config": {
+                "path": "parent.custom.sample2Warning"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "color": "#FF8C00",
+          "path": "material/warning"
+        },
+        "type": "ia.display.icon"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "propConfig": {
+      "custom.conditionEndTime": {
+        "binding": {
+          "config": {
+            "expression": "if(isNull({view.params.conditionStartTime}), \r\n    null, \r\n    addMinutes({view.params.conditionStartTime}, {view.params.conditionDuration}))"
+          },
+          "type": "expr"
+        }
+      },
+      "custom.conditionStatus": {
+        "binding": {
+          "config": {
+            "expression": "if(isNull({view.params.conditionStartTime}),\r\n    \"Not Started\",\r\n    if(now() \u003c toMillis({view.params.conditionStartTime}),\r\n        \"Pending\",\r\n        if(isNull({this.custom.conditionEndTime}),\r\n            \"Running\",\r\n            if(now() \u003c toMillis({this.custom.conditionEndTime}),\r\n                \"Running\",\r\n                \"Complete\"))))"
+          },
+          "type": "expr"
+        }
+      },
+      "custom.sample1Warning": {
+        "binding": {
+          "config": {
+            "expression": "if(isNull({view.params.sample1StartTime}),\r\n    false,\r\n    dateExtract(now(0), \"minute\") \u003d dateExtract({view.params.sample1StartTime}, \"minute\") - 1)"
+          },
+          "type": "expr"
+        }
+      },
+      "custom.sample2Warning": {
+        "binding": {
+          "config": {
+            "expression": "if(isNull({view.params.sample2StartTime}),\r\n    false,\r\n    dateExtract(now(0), \"minute\") \u003d dateExtract({view.params.sample2StartTime}, \"minute\") - 1)"
+          },
+          "type": "expr"
+        }
+      }
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}
